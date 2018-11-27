@@ -3,43 +3,83 @@ package edu.umich.triplemap;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 public class ScheduleActivity extends AppCompatActivity {
 
-    private HashMap<String, String[]> events = new HashMap<String, String[]>();
+    private HashMap<String, String[]> events = new HashMap<>();
 
     public HashMap<String, String[]> getEvents() {
         return events;
     }
 
-    Spinner spinner;
-    ArrayAdapter<String> dataAdapter;
+    private void checkButtonSafety() {
+        if(events.size() == 0) {
+            findViewById(R.id.editEvent).setClickable(false);
+            findViewById(R.id.deleteEventFromSchedule).setClickable(false);
+        } else {
+            findViewById(R.id.editEvent).setClickable(true);
+            findViewById(R.id.deleteEventFromSchedule).setClickable(true);
+        }
+    }
 
     private void recordEvent() {
         Intent intent = getIntent();
 
         String[] details = new String[6];
-        details[0] = intent.getStringExtra("eventFrequency");
+        details[0] = Boolean.toString(intent.getBooleanExtra("eventFrequency", false));
         details[1] = intent.getStringExtra("eventName");
         details[2] = intent.getStringExtra("eventAddress");
         details[3] = intent.getStringExtra("eventRoom");
         details[4] = intent.getStringExtra("eventDate");
         details[5] = intent.getStringExtra("eventStartTime");
 
-        events.put(intent.getStringExtra("eventName"), details);
+        boolean editingEvent = intent.getBooleanExtra("editingEvent", false);
+
+        //Deleting event
+        if(intent.getBooleanExtra("deleteRequest", false)) {
+            events.remove(intent.getStringExtra("previousName"));
+        } else if(intent.getBooleanExtra("cancelRequest", false)) {
+        //do nothing on cancel
+        } else {
+        // Either editing or creating an event
+            if(editingEvent) {
+                events.remove(intent.getStringExtra("previousName"));
+            }
+            events.put(intent.getStringExtra("eventName"), details);
+        }
     }
 
     public void createNewEvent(View view) {
         Intent intent = new Intent(this, EventActivity.class);
         startActivity(intent);
+    }
+
+    public void editEvent(View view) {
+        Intent intent = new Intent(this, EventActivity.class);
+        String[] details = events.get(((Spinner) findViewById(R.id.spinner2)).getSelectedItem().toString());
+        intent.putExtra("eventFrequency", details[0]);
+        intent.putExtra("eventName", details[1]);
+        intent.putExtra("eventAddress", details[2]);
+        intent.putExtra("eventRoom", details[3]);
+        intent.putExtra("eventDate", details[4]);
+        intent.putExtra("eventStartTime", details[5]);
+        startActivity(intent);
+    }
+
+    public void deleteEvent(View view) {
+        Spinner spinner = findViewById(R.id.spinner2);
+        events.remove(spinner.getSelectedItem().toString());
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>(events.keySet()));
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(dataAdapter);
+
+        checkButtonSafety();
     }
 
     @Override
@@ -49,10 +89,12 @@ public class ScheduleActivity extends AppCompatActivity {
 
         ArrayList<String> initialMessage = new ArrayList();
         initialMessage.add("Please create an event");
-        spinner  = findViewById(R.id.spinner2);
-        dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, initialMessage);
+        Spinner spinner  = findViewById(R.id.spinner2);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, initialMessage);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
+
+        checkButtonSafety();
     }
 
     @Override
@@ -62,9 +104,11 @@ public class ScheduleActivity extends AppCompatActivity {
         setIntent(intent);
         recordEvent();
 
-        spinner = findViewById(R.id.spinner2);
-        dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>(events.keySet()));
+        Spinner spinner = findViewById(R.id.spinner2);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>(events.keySet()));
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
+
+        checkButtonSafety();
     }
 }

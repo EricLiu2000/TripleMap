@@ -9,10 +9,46 @@ import android.widget.Switch;
 
 public class EventActivity extends AppCompatActivity {
 
+    private boolean editingEvent = false;
+    private String previousName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event);
+
+        Intent intent = getIntent();
+        if(intent.getStringExtra("eventFrequency") != null) {
+            editingEvent = true;
+            ((Switch) findViewById(R.id.eventFrequency)).setChecked(Boolean.parseBoolean(intent.getStringExtra("eventFrequency")));
+        }
+
+        if(intent.getStringExtra("eventName") != null) {
+            editingEvent = true;
+            ((EditText) findViewById(R.id.eventName)).setText(intent.getStringExtra("eventName"));
+            previousName = intent.getStringExtra("eventName");
+        }
+
+        if(intent.getStringExtra("eventAddress") != null) {
+            editingEvent = true;
+            ((EditText) findViewById(R.id.eventAddress)).setText(intent.getStringExtra("eventAddress"));
+        }
+
+        if(intent.getStringExtra("eventRoom") != null) {
+            editingEvent = true;
+            ((EditText) findViewById(R.id.eventRoom)).setText(intent.getStringExtra("eventRoom"));
+        }
+
+        if(intent.getStringExtra("eventDate") != null) {
+            editingEvent = true;
+            ((EditText) findViewById(R.id.eventDate)).setText(intent.getStringExtra("eventDate"));
+        }
+
+        if(intent.getStringExtra("eventStartTime") != null) {
+            editingEvent = true;
+            ((EditText) findViewById(R.id.eventStartTime)).setText(intent.getStringExtra("eventStartTime"));
+        }
+
     }
 
     public void saveEvent(View view) {
@@ -23,14 +59,21 @@ public class EventActivity extends AppCompatActivity {
         intent.putExtra("eventRoom", ((EditText) findViewById(R.id.eventRoom)).getText().toString());
         intent.putExtra("eventDate", ((EditText) findViewById(R.id.eventDate)).getText().toString());
         intent.putExtra("eventStartTime", ((EditText) findViewById(R.id.eventStartTime)).getText().toString());
+        intent.putExtra("editingEvent", editingEvent);
+        intent.putExtra("previousName", previousName);
         startActivity(intent);
     }
 
     public void cancelChanges(View view) {
-
+        Intent intent = new Intent(this, ScheduleActivity.class);
+        intent.putExtra("cancelRequest", true);
+        startActivity(intent);
     }
 
     public void deleteEvent(View view) {
-
+        Intent intent = new Intent(this, ScheduleActivity.class);
+        intent.putExtra("previousName", previousName);
+        intent.putExtra("deleteRequest", true);
+        startActivity(intent);
     }
 }

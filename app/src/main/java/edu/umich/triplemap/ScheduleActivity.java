@@ -12,9 +12,9 @@ import java.util.HashMap;
 
 public class ScheduleActivity extends AppCompatActivity {
 
-    private HashMap<String, String[]> events = new HashMap<>();
+    private static HashMap<String, String[]> events = new HashMap<>();
 
-    public HashMap<String, String[]> getEvents() {
+    public static HashMap<String, String[]> getEvents() {
         return events;
     }
 

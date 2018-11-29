@@ -1,3 +1,6 @@
+#API Key
+app/src/debug/res/values/google_maps_api.xml
+
 # Built application files
 *.apk
 *.ap_

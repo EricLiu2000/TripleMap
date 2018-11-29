@@ -96,6 +96,11 @@ public class ScheduleActivity extends AppCompatActivity {
         checkButtonSafety();
     }
 
+    public void goToMaps(View view) {
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

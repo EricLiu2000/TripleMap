@@ -62,12 +62,14 @@ public class EventActivity extends AppCompatActivity {
         intent.putExtra("editingEvent", editingEvent);
         intent.putExtra("previousName", previousName);
         startActivity(intent);
+        finish();
     }
 
     public void cancelChanges(View view) {
         Intent intent = new Intent(this, ScheduleActivity.class);
         intent.putExtra("cancelRequest", true);
         startActivity(intent);
+        finish();
     }
 
     public void deleteEvent(View view) {
@@ -75,5 +77,6 @@ public class EventActivity extends AppCompatActivity {
         intent.putExtra("previousName", previousName);
         intent.putExtra("deleteRequest", true);
         startActivity(intent);
+        finish();
     }
 }

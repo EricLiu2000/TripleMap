@@ -12,14 +12,13 @@ import android.view.View;
 import java.util.HashMap;
 
 public class MainActivity extends AppCompatActivity {
-
     private HashMap<String, String[]> events;
 
     private BroadcastReceiver mReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             events = ScheduleActivity.getEvents();
-            //TODO: more update stuff here
+            //TODO: recalculate google maps paths
         }
     };
 

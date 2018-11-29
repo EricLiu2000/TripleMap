@@ -38,6 +38,10 @@ public class ScheduleActivity extends AppCompatActivity {
     private void recordEvent() {
         Intent intent = getIntent();
 
+        if(intent.getStringExtra("eventName") == null) {
+            return;
+        }
+
         String[] details = new String[6];
         details[0] = Boolean.toString(intent.getBooleanExtra("eventFrequency", false));
         details[1] = intent.getStringExtra("eventName");

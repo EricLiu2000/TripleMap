@@ -1,6 +1,7 @@
 package edu.umich.triplemap;
 
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -28,6 +29,12 @@ public class ScheduleActivity extends AppCompatActivity {
         }
     }
 
+    private void broadcastChanges() {
+        // Broadcast that the events hashmap has changed, so main will know
+        Intent changedIntent = new Intent("changedEvents");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(changedIntent);
+    }
+
     private void recordEvent() {
         Intent intent = getIntent();
 
@@ -43,11 +50,17 @@ public class ScheduleActivity extends AppCompatActivity {
 
         //Deleting event
         if(intent.getBooleanExtra("deleteRequest", false)) {
+            broadcastChanges();
+
+            // Remove the desired event from the events hashmap
             events.remove(intent.getStringExtra("previousName"));
         } else if(intent.getBooleanExtra("cancelRequest", false)) {
         //do nothing on cancel
         } else {
         // Either editing or creating an event
+
+            broadcastChanges();
+
             if(editingEvent) {
                 events.remove(intent.getStringExtra("previousName"));
             }
@@ -73,6 +86,7 @@ public class ScheduleActivity extends AppCompatActivity {
     }
 
     public void deleteEvent(View view) {
+        broadcastChanges();
         Spinner spinner = findViewById(R.id.spinner2);
         events.remove(spinner.getSelectedItem().toString());
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>(events.keySet()));

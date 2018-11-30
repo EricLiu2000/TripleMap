@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.model.DirectionsResult;
@@ -24,6 +26,8 @@ import com.google.maps.model.TravelMode;
 
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -88,7 +92,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         events = ScheduleActivity.getEvents();
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
@@ -113,13 +117,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         timeInSeconds += result.routes[0].legs[j].duration.inSeconds;
                     }
                     ((Event) events.get(i)).setLengthInSeconds(timeInSeconds);
+
+                    PolylineOptions options  = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
+                    List<LatLng> list = new ArrayList<>();
+                    for(com.google.maps.model.LatLng pos : result.routes[0].overviewPolyline.decodePath()) {
+                        list.add(new LatLng(pos.lat, pos.lng));
+                    }
+                    mMap.addPolyline(options.addAll(list));
                 } catch(Exception e) {
                     e.printStackTrace();
                 }
             }
         }
-
-
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);

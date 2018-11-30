@@ -1,21 +1,20 @@
 package edu.umich.triplemap;
 
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ScheduleActivity extends AppCompatActivity {
 
-    private static HashMap<String, String[]> events = new HashMap<>();
+    private static EventList events = new EventList();
 
-    public static HashMap<String, String[]> getEvents() {
+    public static EventList getEvents() {
         return events;
     }
 
@@ -42,13 +41,20 @@ public class ScheduleActivity extends AppCompatActivity {
             return;
         }
 
-        String[] details = new String[6];
-        details[0] = Boolean.toString(intent.getBooleanExtra("eventFrequency", false));
-        details[1] = intent.getStringExtra("eventName");
-        details[2] = intent.getStringExtra("eventAddress");
-        details[3] = intent.getStringExtra("eventRoom");
-        details[4] = intent.getStringExtra("eventDate");
-        details[5] = intent.getStringExtra("eventStartTime");
+        String[] details = new String[5];
+        details[0] = intent.getStringExtra("eventName");
+        details[1] = intent.getStringExtra("eventAddress");
+        details[2] = intent.getStringExtra("eventRoom");
+        details[3] = intent.getStringExtra("eventDate");
+        details[4] = intent.getStringExtra("eventStartTime");
+
+        Event event = new Event();
+        event.setIsWeekly(intent.getBooleanExtra("eventFrequency", false));
+        event.setName(details[0]);
+        event.setAddress(details[1]);
+        event.setRoom(details[2]);
+        event.setDate(details[3]);
+        event.setStartTime(details[4]);
 
         boolean editingEvent = intent.getBooleanExtra("editingEvent", false);
 
@@ -68,7 +74,7 @@ public class ScheduleActivity extends AppCompatActivity {
             if(editingEvent) {
                 events.remove(intent.getStringExtra("previousName"));
             }
-            events.put(intent.getStringExtra("eventName"), details);
+            events.add(event);
         }
     }
 
@@ -79,13 +85,13 @@ public class ScheduleActivity extends AppCompatActivity {
 
     public void editEvent(View view) {
         Intent intent = new Intent(this, EventActivity.class);
-        String[] details = events.get(((Spinner) findViewById(R.id.spinner2)).getSelectedItem().toString());
-        intent.putExtra("eventFrequency", details[0]);
-        intent.putExtra("eventName", details[1]);
-        intent.putExtra("eventAddress", details[2]);
-        intent.putExtra("eventRoom", details[3]);
-        intent.putExtra("eventDate", details[4]);
-        intent.putExtra("eventStartTime", details[5]);
+        Event event = (Event) events.get(((Spinner) findViewById(R.id.spinner2)).getSelectedItem().toString());
+        intent.putExtra("eventFrequency", event.getIsWeekly());
+        intent.putExtra("eventName", event.getName());
+        intent.putExtra("eventAddress", event.getAddress());
+        intent.putExtra("eventRoom", event.getRoom());
+        intent.putExtra("eventDate", event.getDate());
+        intent.putExtra("eventStartTime", event.getStartTime());
         startActivity(intent);
     }
 
@@ -93,7 +99,7 @@ public class ScheduleActivity extends AppCompatActivity {
         broadcastChanges();
         Spinner spinner = findViewById(R.id.spinner2);
         events.remove(spinner.getSelectedItem().toString());
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>(events.keySet()));
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, events);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
 
@@ -128,7 +134,7 @@ public class ScheduleActivity extends AppCompatActivity {
         recordEvent();
 
         Spinner spinner = findViewById(R.id.spinner2);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>(events.keySet()));
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, events);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
 

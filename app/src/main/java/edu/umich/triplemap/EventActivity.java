@@ -1,8 +1,8 @@
 package edu.umich.triplemap;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -18,10 +18,7 @@ public class EventActivity extends AppCompatActivity {
         setContentView(R.layout.activity_event);
 
         Intent intent = getIntent();
-        if(intent.getStringExtra("eventFrequency") != null) {
-            editingEvent = true;
-            ((Switch) findViewById(R.id.eventFrequency)).setChecked(Boolean.parseBoolean(intent.getStringExtra("eventFrequency")));
-        }
+        ((Switch) findViewById(R.id.eventFrequency)).setChecked(intent.getBooleanExtra("eventFrequency", false));
 
         if(intent.getStringExtra("eventName") != null) {
             editingEvent = true;
@@ -76,6 +73,7 @@ public class EventActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ScheduleActivity.class);
         intent.putExtra("previousName", previousName);
         intent.putExtra("deleteRequest", true);
+        intent.putExtra("eventName", "placeholderForNotNull");
         startActivity(intent);
         finish();
     }

@@ -34,6 +34,7 @@
 
         <activity
             android:name=".MapsActivity"
+            android:launchMode="singleInstance"
             android:parentActivityName=".ScheduleActivity"
             android:label="@string/title_activity_maps">
             <meta-data

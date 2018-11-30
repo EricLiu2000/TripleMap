@@ -1,5 +1,7 @@
 package edu.umich.triplemap;
 
+import org.joda.time.DateTime;
+
 public class Event {
     public boolean getIsWeekly() {
         return isWeekly;
@@ -86,6 +88,54 @@ public class Event {
     }
 
     private long lengthInSeconds = 0;
+
+    /**
+     *
+     * @return [Hour, Minute]
+     */
+    public int[] getProcessedTime() {
+        String timeCopy = startTime;
+        String[] time = timeCopy.split(":");
+        if(time.length == 2) {
+            return new int[] {Integer.valueOf(time[0]), Integer.valueOf(time[1])};
+        } else {
+            //Assume only hour specified
+            return new int[] {Integer.valueOf(time[0]), 0};
+        }
+    }
+
+    /**
+     *
+     * @return [Month, Day, Year]
+     */
+    public int[] getProcessedDate() {
+        String dateCopy = this.date;
+        String[] date = dateCopy.split("/");
+        //month/day/year(19 vs 2019)
+        if(date.length == 3) {
+            //Only 2 digits specified
+            int year = 2000;
+            if(Integer.valueOf(date[2]) < 100) {
+                year = year + Integer.valueOf(date[2]);
+            } else {
+                year = Integer.valueOf(date[2]);
+            }
+            return new int[] {Integer.valueOf(date[0]), Integer.valueOf(date[1]), year};
+        } else {
+            //Assume month/day specified, year is 2018
+            return new int[] {Integer.valueOf(date[0]), Integer.valueOf(date[1]), 2018};
+        }
+    }
+
+    public DateTime getDepartureTime() {
+        return departureTime;
+    }
+
+    public void setDepartureTime(DateTime departureTime) {
+        this.departureTime = departureTime;
+    }
+
+    private DateTime departureTime;
 
     @Override
     public String toString() {

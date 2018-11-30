@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,6 +40,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationManager locationManager;
 
     private EventList events;
+
+    private void broadcastChanges() {
+        Intent changedIntent = new Intent("updatedRoutes");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(changedIntent);
+    }
 
     public void backToSchedule(View view) {
         Intent intent = new Intent(this, ScheduleActivity.class);
@@ -109,14 +115,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             long timeInSeconds = 0;
 
-            if(checkEventDetails((Event) events.get(i))) {
+            if(checkEventDetails(events.get(i))) {
                 try {
                     DirectionsResult result = DirectionsApi.newRequest(getGeoContext()).mode(TravelMode.TRANSIT)
                             .origin(new com.google.maps.model.LatLng(lat, lon)).destination(((Event) events.get(i)).getAddress()).departureTime(time).await();
                     for(int j = 0; j < result.routes[0].legs.length; j++) {
                         timeInSeconds += result.routes[0].legs[j].duration.inSeconds;
                     }
-                    ((Event) events.get(i)).setLengthInSeconds(timeInSeconds);
+                    events.get(i).setLengthInSeconds(timeInSeconds);
 
                     PolylineOptions options  = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);
                     List<LatLng> list = new ArrayList<>();
@@ -124,6 +130,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         list.add(new LatLng(pos.lat, pos.lng));
                     }
                     mMap.addPolyline(options.addAll(list));
+
+                    broadcastChanges();
                 } catch(Exception e) {
                     e.printStackTrace();
                 }

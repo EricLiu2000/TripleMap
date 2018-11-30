@@ -1,6 +1,9 @@
 package edu.umich.triplemap;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -8,11 +11,28 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 
 public class ScheduleActivity extends AppCompatActivity {
 
-    private static EventList events = new EventList();
+    private BroadcastReceiver listener = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent ) {
+            for(int i = 0; i < events.size(); i++) {
+                if(events.get(i).getLengthInSeconds() != 0) {
+                    int[] processedDate = events.get(i).getProcessedDate();
+                    int[] processedTime = events.get(i).getProcessedTime();
+                    DateTime time = new DateTime(processedDate[2], processedDate[0], processedDate[1], processedTime[0], processedTime[1]);
+                    DateTime departureTime = time.minusSeconds((int) events.get(i).getLengthInSeconds());
+                    events.get(i).setDepartureTime(departureTime);
+                }
+            }
+        }
+    };
+
+    private static EventList<Event> events = new EventList();
 
     public static EventList getEvents() {
         return events;
@@ -26,12 +46,6 @@ public class ScheduleActivity extends AppCompatActivity {
             findViewById(R.id.editEvent).setClickable(true);
             findViewById(R.id.deleteEventFromSchedule).setClickable(true);
         }
-    }
-
-    private void broadcastChanges() {
-        // Broadcast that the events hashmap has changed, so main will know
-        Intent changedIntent = new Intent("changedEvents");
-        LocalBroadcastManager.getInstance(this).sendBroadcast(changedIntent);
     }
 
     private void recordEvent() {
@@ -60,17 +74,12 @@ public class ScheduleActivity extends AppCompatActivity {
 
         //Deleting event
         if(intent.getBooleanExtra("deleteRequest", false)) {
-            broadcastChanges();
-
             // Remove the desired event from the events hashmap
             events.remove(intent.getStringExtra("previousName"));
         } else if(intent.getBooleanExtra("cancelRequest", false)) {
         //do nothing on cancel
         } else {
         // Either editing or creating an event
-
-            broadcastChanges();
-
             if(editingEvent) {
                 events.remove(intent.getStringExtra("previousName"));
             }
@@ -85,7 +94,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
     public void editEvent(View view) {
         Intent intent = new Intent(this, EventActivity.class);
-        Event event = (Event) events.get(((Spinner) findViewById(R.id.spinner2)).getSelectedItem().toString());
+        Event event = events.get(((Spinner) findViewById(R.id.spinner2)).getSelectedItem().toString());
         intent.putExtra("eventFrequency", event.getIsWeekly());
         intent.putExtra("eventName", event.getName());
         intent.putExtra("eventAddress", event.getAddress());
@@ -96,7 +105,6 @@ public class ScheduleActivity extends AppCompatActivity {
     }
 
     public void deleteEvent(View view) {
-        broadcastChanges();
         Spinner spinner = findViewById(R.id.spinner2);
         events.remove(spinner.getSelectedItem().toString());
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, events);
@@ -115,7 +123,7 @@ public class ScheduleActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
-
+        LocalBroadcastManager.getInstance(this).registerReceiver(listener, new IntentFilter("updatedRoutes"));
         ArrayList<String> initialMessage = new ArrayList();
         initialMessage.add("Please create an event");
         Spinner spinner  = findViewById(R.id.spinner2);

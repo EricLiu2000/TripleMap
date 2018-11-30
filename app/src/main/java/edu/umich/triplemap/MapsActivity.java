@@ -1,25 +1,29 @@
 package edu.umich.triplemap;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.DirectionsApi;
 import com.google.maps.GeoApiContext;
+import com.google.maps.model.DirectionsResult;
+import com.google.maps.model.TravelMode;
 
-import java.util.HashMap;
+import org.joda.time.DateTime;
+
 import java.util.concurrent.TimeUnit;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -28,7 +32,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
 
-    private FusedLocationProviderClient mLocationProvider;
+    private LocationManager locationManager;
 
     private EventList events;
 
@@ -46,8 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-        mLocationProvider = LocationServices.getFusedLocationProviderClient(this);
-        events = ScheduleActivity.getEvents();
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
     }
 
     private GeoApiContext getGeoContext() {
@@ -55,6 +58,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return geoApiContext.setQueryRateLimit(3).setApiKey(getString(R.string.google_maps_key))
                 .setConnectTimeout(1, TimeUnit.SECONDS).setReadTimeout(1, TimeUnit.SECONDS)
                 .setWriteTimeout(1, TimeUnit.SECONDS);
+    }
+
+    private boolean checkEventDetails(Event event) {
+        if(event.getName() == null || event.getName() == "") {
+            return false;
+        } else if(event.getAddress() == null || event.getAddress() == "") {
+            return false;
+        } else if(event.getStartTime() == null || event.getAddress() == "") {
+            return false;
+        } else if(event.getDate() == null || event.getDate() == "") {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -70,6 +86,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        events = ScheduleActivity.getEvents();
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
@@ -77,6 +95,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
+
+        Double lat = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLatitude();
+        Double lon = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER).getLongitude();
+
+        DateTime time = new DateTime();
+
+        for(int i = 0; i < events.size(); i++) {
+
+            long timeInSeconds = 0;
+
+            if(checkEventDetails((Event) events.get(i))) {
+                try {
+                    DirectionsResult result = DirectionsApi.newRequest(getGeoContext()).mode(TravelMode.TRANSIT)
+                            .origin(new com.google.maps.model.LatLng(lat, lon)).destination(((Event) events.get(i)).getAddress()).departureTime(time).await();
+                    for(int j = 0; j < result.routes[0].legs.length; j++) {
+                        timeInSeconds += result.routes[0].legs[j].duration.inSeconds;
+                    }
+                    ((Event) events.get(i)).setLengthInSeconds(timeInSeconds);
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
 
         // Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);

@@ -77,6 +77,16 @@ public class Event {
 
     private String startTime = "";
 
+    public long getLengthInSeconds() {
+        return lengthInSeconds;
+    }
+
+    public void setLengthInSeconds(long lengthInSeconds) {
+        this.lengthInSeconds = lengthInSeconds;
+    }
+
+    private long lengthInSeconds = 0;
+
     @Override
     public String toString() {
         return name;

@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.joda.time.DateTime;
 
@@ -42,9 +43,11 @@ public class ScheduleActivity extends AppCompatActivity {
         if(events.size() == 0) {
             findViewById(R.id.editEvent).setClickable(false);
             findViewById(R.id.deleteEventFromSchedule).setClickable(false);
+            findViewById(R.id.getDepartureTime).setClickable(false);
         } else {
             findViewById(R.id.editEvent).setClickable(true);
             findViewById(R.id.deleteEventFromSchedule).setClickable(true);
+            findViewById(R.id.getDepartureTime).setClickable(true);
         }
     }
 
@@ -132,6 +135,16 @@ public class ScheduleActivity extends AppCompatActivity {
         spinner.setAdapter(dataAdapter);
 
         checkButtonSafety();
+    }
+
+    public void getDepartureTime(View view) {
+        Spinner spinner = findViewById(R.id.spinner2);
+        if(events.get(spinner.getSelectedItem().toString()).getDepartureTime() == null) {
+            return;
+        } else {
+            ((TextView)findViewById(R.id.departureTime)).setText(events.get(spinner.getSelectedItem().toString()).getDepartureTime().toString());
+        }
+
     }
 
     @Override

@@ -5,6 +5,14 @@ import java.util.ArrayList;
 
 public class EventList<E> extends ArrayList {
 
+    public ArrayList<String> getEventNames() {
+        ArrayList<String> names = new ArrayList<>();
+        for(int i = 0; i < size(); i++) {
+            names.add(get(i).toString());
+        }
+        return names;
+    }
+
     public void remove(String s) {
         for(int i = 0; i < size(); i++) {
             if(get(i).toString().equals(s)) {

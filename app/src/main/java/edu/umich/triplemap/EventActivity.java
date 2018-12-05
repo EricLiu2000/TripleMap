@@ -12,6 +12,12 @@ public class EventActivity extends AppCompatActivity {
     private boolean editingEvent = false;
     private String previousName;
 
+    private String prevAddress = "";
+    private String prevRoom = "";
+    private String prevDate = "";
+    private String prevStartTime = "";
+    private String prevDepartureTime = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,21 +35,29 @@ public class EventActivity extends AppCompatActivity {
         if(intent.getStringExtra("eventAddress") != null) {
             editingEvent = true;
             ((EditText) findViewById(R.id.eventAddress)).setText(intent.getStringExtra("eventAddress"));
+            prevAddress = intent.getStringExtra("eventAddress");
         }
 
         if(intent.getStringExtra("eventRoom") != null) {
             editingEvent = true;
             ((EditText) findViewById(R.id.eventRoom)).setText(intent.getStringExtra("eventRoom"));
+            prevRoom = intent.getStringExtra("eventRoom");
         }
 
         if(intent.getStringExtra("eventDate") != null) {
             editingEvent = true;
             ((EditText) findViewById(R.id.eventDate)).setText(intent.getStringExtra("eventDate"));
+            prevDate = intent.getStringExtra("eventDate");
         }
 
         if(intent.getStringExtra("eventStartTime") != null) {
             editingEvent = true;
             ((EditText) findViewById(R.id.eventStartTime)).setText(intent.getStringExtra("eventStartTime"));
+            prevStartTime = intent.getStringExtra("eventStartTime");
+        }
+
+        if(intent.getStringExtra("departureTime") != null) {
+            prevDepartureTime = intent.getStringExtra("departureTime");
         }
 
     }
@@ -58,6 +72,15 @@ public class EventActivity extends AppCompatActivity {
         intent.putExtra("eventStartTime", ((EditText) findViewById(R.id.eventStartTime)).getText().toString());
         intent.putExtra("editingEvent", editingEvent);
         intent.putExtra("previousName", previousName);
+
+        if(prevAddress.equals(((EditText) findViewById(R.id.eventAddress)).getText().toString())
+                && prevRoom.equals(((EditText) findViewById(R.id.eventRoom)).getText().toString())
+                && prevDate.equals(((EditText) findViewById(R.id.eventDate)).getText().toString())
+                && prevStartTime.equals(((EditText) findViewById(R.id.eventStartTime)).getText().toString())
+                && prevDepartureTime != null) {
+            intent.putExtra("departureTime", prevDepartureTime);
+        }
+
         startActivity(intent);
         finish();
     }

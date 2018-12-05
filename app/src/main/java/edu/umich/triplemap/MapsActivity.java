@@ -11,6 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -71,13 +72,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private boolean checkEventDetails(Event event) {
-        if(event.getName() == null || event.getName() == "") {
+        if(event.getName() == null || event.getName().equals("")) {
             return false;
-        } else if(event.getAddress() == null || event.getAddress() == "") {
+        } else if(event.getAddress() == null || event.getAddress().equals("")) {
             return false;
-        } else if(event.getStartTime() == null || event.getAddress() == "") {
+        } else if(event.getStartTime() == null || event.getStartTime().equals("")) {
             return false;
-        } else if(event.getDate() == null || event.getDate() == "") {
+        } else if(event.getDate() == null || event.getDate().equals("")) {
             return false;
         }
         return true;

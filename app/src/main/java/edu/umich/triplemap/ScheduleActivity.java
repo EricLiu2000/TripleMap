@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -43,11 +44,9 @@ public class ScheduleActivity extends AppCompatActivity {
         if(events.size() == 0) {
             findViewById(R.id.editEvent).setClickable(false);
             findViewById(R.id.deleteEventFromSchedule).setClickable(false);
-            findViewById(R.id.getDepartureTime).setClickable(false);
         } else {
             findViewById(R.id.editEvent).setClickable(true);
             findViewById(R.id.deleteEventFromSchedule).setClickable(true);
-            findViewById(R.id.getDepartureTime).setClickable(true);
         }
     }
 
@@ -72,6 +71,10 @@ public class ScheduleActivity extends AppCompatActivity {
         event.setRoom(details[2]);
         event.setDate(details[3]);
         event.setStartTime(details[4]);
+
+        if(intent.getStringExtra("departureTime") != null) {
+            event.setDepartureTime(DateTime.parse(intent.getStringExtra("departureTime")));
+        }
 
         boolean editingEvent = intent.getBooleanExtra("editingEvent", false);
 
@@ -104,6 +107,9 @@ public class ScheduleActivity extends AppCompatActivity {
         intent.putExtra("eventRoom", event.getRoom());
         intent.putExtra("eventDate", event.getDate());
         intent.putExtra("eventStartTime", event.getStartTime());
+        if(event.getDepartureTime() != null) {
+            intent.putExtra("departureTime", event.getDepartureTime().toString());
+        }
         startActivity(intent);
     }
 
@@ -127,24 +133,12 @@ public class ScheduleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule);
         LocalBroadcastManager.getInstance(this).registerReceiver(listener, new IntentFilter("updatedRoutes"));
-        ArrayList<String> initialMessage = new ArrayList();
-        initialMessage.add("Please create an event");
         Spinner spinner  = findViewById(R.id.spinner2);
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, initialMessage);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<String>());
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
 
         checkButtonSafety();
-    }
-
-    public void getDepartureTime(View view) {
-        Spinner spinner = findViewById(R.id.spinner2);
-        if(events.get(spinner.getSelectedItem().toString()).getDepartureTime() == null) {
-            return;
-        } else {
-            ((TextView)findViewById(R.id.departureTime)).setText(events.get(spinner.getSelectedItem().toString()).getDepartureTime().toString());
-        }
-
     }
 
     @Override
@@ -154,10 +148,58 @@ public class ScheduleActivity extends AppCompatActivity {
         setIntent(intent);
         recordEvent();
 
-        Spinner spinner = findViewById(R.id.spinner2);
+        final Spinner spinner = findViewById(R.id.spinner2);
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, events);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                if(events.get(spinner.getSelectedItem().toString()).getDepartureTime() != null) {
+                    String departureTime = "";
+                    boolean pm = false;
+                    int hour = events.get(spinner.getSelectedItem().toString()).getDepartureTime().hourOfDay().get();
+                    if(hour > 12) {
+                        pm = true;
+                        hour -= 12;
+                    }
+                    int min = events.get(spinner.getSelectedItem().toString()).getDepartureTime().minuteOfHour().get();
+                    int sec = events.get(spinner.getSelectedItem().toString()).getDepartureTime().secondOfMinute().get();
+
+                    if(hour < 10) {
+                        departureTime += "0" + Integer.toString(hour);
+                    } else {
+                        departureTime += Integer.toString(hour);
+                    }
+
+                    if(min < 10) {
+                        departureTime += ":0" + Integer.toString(min);
+                    } else {
+                        departureTime += (":" + Integer.toString(min));
+                    }
+
+                    if(sec < 10) {
+                        departureTime += (":0" + Integer.toString(sec));
+                    } else {
+                        departureTime += (":" + Integer.toString(sec));
+                    }
+
+                    if(pm) {
+                        departureTime += " PM";
+                    } else {
+                        departureTime += " AM";
+                    }
+                    ((TextView) findViewById(R.id.departureTime)).setText(departureTime);
+                } else {
+                    ((TextView) findViewById(R.id.departureTime)).setText("No departure time for this event");
+                }
+            }
+
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                ((TextView) findViewById(R.id.departureTime)).setText("No event selected");
+                return;
+            }
+        });
 
         checkButtonSafety();
     }

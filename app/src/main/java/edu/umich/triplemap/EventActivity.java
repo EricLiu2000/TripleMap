@@ -16,7 +16,7 @@ public class EventActivity extends AppCompatActivity {
     private String prevRoom = "";
     private String prevDate = "";
     private String prevStartTime = "";
-    private String prevDepartureTime = "";
+    private String prevDepartureTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

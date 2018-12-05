@@ -120,6 +120,14 @@ public class ScheduleActivity extends AppCompatActivity {
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(dataAdapter);
 
+        if(events.size() == 0) {
+            ((TextView) findViewById(R.id.departureTime)).setText("No event selected");
+        } else if(events.get(spinner.getSelectedItem().toString()).getDepartureTime() != null) {
+            ((TextView) findViewById(R.id.departureTime)).setText(getProcessedDepartureTime());
+        } else {
+            ((TextView) findViewById(R.id.departureTime)).setText("No departure time for this event");
+        }
+
         checkButtonSafety();
     }
 
@@ -156,40 +164,7 @@ public class ScheduleActivity extends AppCompatActivity {
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if(events.get(spinner.getSelectedItem().toString()).getDepartureTime() != null) {
-                    String departureTime = "";
-                    boolean pm = false;
-                    int hour = events.get(spinner.getSelectedItem().toString()).getDepartureTime().hourOfDay().get();
-                    if(hour > 12) {
-                        pm = true;
-                        hour -= 12;
-                    }
-                    int min = events.get(spinner.getSelectedItem().toString()).getDepartureTime().minuteOfHour().get();
-                    int sec = events.get(spinner.getSelectedItem().toString()).getDepartureTime().secondOfMinute().get();
-
-                    if(hour < 10) {
-                        departureTime += "0" + Integer.toString(hour);
-                    } else {
-                        departureTime += Integer.toString(hour);
-                    }
-
-                    if(min < 10) {
-                        departureTime += ":0" + Integer.toString(min);
-                    } else {
-                        departureTime += (":" + Integer.toString(min));
-                    }
-
-                    if(sec < 10) {
-                        departureTime += (":0" + Integer.toString(sec));
-                    } else {
-                        departureTime += (":" + Integer.toString(sec));
-                    }
-
-                    if(pm) {
-                        departureTime += " PM";
-                    } else {
-                        departureTime += " AM";
-                    }
-                    ((TextView) findViewById(R.id.departureTime)).setText(departureTime);
+                    ((TextView) findViewById(R.id.departureTime)).setText(getProcessedDepartureTime());
                 } else {
                     ((TextView) findViewById(R.id.departureTime)).setText("No departure time for this event");
                 }
@@ -202,5 +177,45 @@ public class ScheduleActivity extends AppCompatActivity {
         });
 
         checkButtonSafety();
+    }
+
+    private String getProcessedDepartureTime() {
+        Spinner spinner = findViewById(R.id.spinner2);
+        String departureTime = "";
+
+        boolean pm = false;
+        int hour = events.get(spinner.getSelectedItem().toString()).getDepartureTime().hourOfDay().get();
+        if(hour > 12) {
+            pm = true;
+            hour -= 12;
+        }
+        int min = events.get(spinner.getSelectedItem().toString()).getDepartureTime().minuteOfHour().get();
+        int sec = events.get(spinner.getSelectedItem().toString()).getDepartureTime().secondOfMinute().get();
+
+        if(hour < 10) {
+            departureTime += "0" + Integer.toString(hour);
+        } else {
+            departureTime += Integer.toString(hour);
+        }
+
+        if(min < 10) {
+            departureTime += ":0" + Integer.toString(min);
+        } else {
+            departureTime += (":" + Integer.toString(min));
+        }
+
+        if(sec < 10) {
+            departureTime += (":0" + Integer.toString(sec));
+        } else {
+            departureTime += (":" + Integer.toString(sec));
+        }
+
+        if(pm) {
+            departureTime += " PM";
+        } else {
+            departureTime += " AM";
+        }
+
+        return departureTime;
     }
 }

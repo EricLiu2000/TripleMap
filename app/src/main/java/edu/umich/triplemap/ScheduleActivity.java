@@ -125,7 +125,7 @@ public class ScheduleActivity extends AppCompatActivity {
         } else if(events.get(spinner.getSelectedItem().toString()).getDepartureTime() != null) {
             ((TextView) findViewById(R.id.departureTime)).setText(getProcessedDepartureTime());
         } else {
-            ((TextView) findViewById(R.id.departureTime)).setText("No departure time for this event");
+            ((TextView) findViewById(R.id.departureTime)).setText("Departure time unavailable");
         }
 
         checkButtonSafety();
@@ -166,7 +166,7 @@ public class ScheduleActivity extends AppCompatActivity {
                 if(events.get(spinner.getSelectedItem().toString()).getDepartureTime() != null) {
                     ((TextView) findViewById(R.id.departureTime)).setText(getProcessedDepartureTime());
                 } else {
-                    ((TextView) findViewById(R.id.departureTime)).setText("No departure time for this event");
+                    ((TextView) findViewById(R.id.departureTime)).setText("Departure time unavailable");
                 }
             }
 
@@ -181,7 +181,7 @@ public class ScheduleActivity extends AppCompatActivity {
 
     private String getProcessedDepartureTime() {
         Spinner spinner = findViewById(R.id.spinner2);
-        String departureTime = "";
+        String departureTime = "Leave at ";
 
         boolean pm = false;
         int hour = events.get(spinner.getSelectedItem().toString()).getDepartureTime().hourOfDay().get();

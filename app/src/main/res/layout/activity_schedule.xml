@@ -10,75 +10,80 @@
         android:id="@+id/createEvent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginTop="16dp"
         android:onClick="createNewEvent"
-        android:text="Create New Event"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Create Event"
+        app:layout_constraintEnd_toStartOf="@+id/deleteEventFromSchedule"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/spinner2" />
 
     <Spinner
         android:id="@+id/spinner2"
         android:layout_width="368dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/createEvent" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
     <Button
         android:id="@+id/editEvent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:onClick="editEvent"
         android:text="Edit Event"
+        app:layout_constraintBaseline_toBaselineOf="@+id/deleteEventFromSchedule"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner2" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/deleteEventFromSchedule" />
 
     <Button
         android:id="@+id/deleteEventFromSchedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:onClick="deleteEvent"
         android:text="Delete Event"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editEvent" />
+        app:layout_constraintBaseline_toBaselineOf="@+id/createEvent"
+        app:layout_constraintEnd_toStartOf="@+id/editEvent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/createEvent" />
 
     <Button
         android:id="@+id/goToMaps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:onClick="goToMaps"
         android:text="Go To Maps"
+        app:layout_constraintBaseline_toBaselineOf="@+id/departureTime"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/deleteEventFromSchedule" />
+        app:layout_constraintStart_toEndOf="@+id/departureTime" />
 
     <TextView
         android:id="@+id/departureTime"
-        android:layout_width="151dp"
-        android:layout_height="116dp"
+        android:layout_width="194dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:text="No event currently selected"
+        android:textAlignment="center"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/createEvent" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="228dp"
+        android:layout_height="224dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:text="No event currently selected"
-        android:textAlignment="textStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/goToMaps" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/kitkatkings" />
 
 </android.support.constraint.ConstraintLayout>

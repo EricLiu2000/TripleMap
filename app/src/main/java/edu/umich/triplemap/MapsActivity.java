@@ -84,6 +84,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return true;
     }
 
+    private int getNumbersFromString(String s) {
+        String nums = "";
+        for(int i = 0; i < s.length(); i++) {
+            if(s.charAt(i) == '0' || s.charAt(i) == '1' || s.charAt(i) == '2' || s.charAt(i) == '3' || s.charAt(i) == '4'
+                    || s.charAt(i) == '5' || s.charAt(i) == '6' || s.charAt(i) == '7' || s.charAt(i) == '8' || s.charAt(i) == '9') {
+                nums += s.charAt(i);
+            }
+        }
+        if(nums.length() == 0) {
+            return -1;
+        } else {
+            return Integer.valueOf(nums);
+        }
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -123,6 +138,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     for(int j = 0; j < result.routes[0].legs.length; j++) {
                         timeInSeconds += result.routes[0].legs[j].duration.inSeconds;
                     }
+
+                    if(!events.get(i).getRoom().equals("") && events.get(i).getRoom() != null) {
+                        int floorNumber = getNumbersFromString(events.get(i).getRoom());
+
+                        if(floorNumber >= 3000) {
+                        // Likely taking the elevator
+                            // Doors opening and closing
+                            timeInSeconds += 10;
+                            // 2 seconds per floor
+                            timeInSeconds += (Math.floor(floorNumber / 1000.0) - 1) * 2.0;
+                            // Within floor transit
+                            timeInSeconds += 45;
+                        } else if(floorNumber >= 2000) {
+                        // Likely 1 or 2 flights of stairs
+                            // 9 seconds per floor
+                            timeInSeconds += (Math.floor(floorNumber / 1000.0) - 1) * 9.0;
+                            // Within floor transit
+                            timeInSeconds += 45;
+                        } else {
+                        // Ground floor
+                            // Within floor transit
+                            timeInSeconds += 45;
+                        }
+                    }
+
                     events.get(i).setLengthInSeconds(timeInSeconds);
 
                     PolylineOptions options  = new PolylineOptions().width(5).color(Color.BLUE).geodesic(true);

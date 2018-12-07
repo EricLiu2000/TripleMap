@@ -199,6 +199,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         e.printStackTrace();
                     }
                 } else {
+                    Intent intent = new Intent(this, ScheduleActivity.class);
+                    startActivity(intent);
+                    finish();
+
                     // permission denied, boo! Disable the
                     // functionality that depends on this permission.
                     // Hope it doesn't get here because then we're dead

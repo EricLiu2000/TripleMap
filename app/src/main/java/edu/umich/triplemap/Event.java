@@ -98,6 +98,8 @@ public class Event {
         boolean am = false;
         boolean pm = false;
 
+        timeCopy = timeCopy.replaceAll(" ", "");
+
         if(timeCopy.contains("AM") || timeCopy.contains("am")) {
             am = true;
             timeCopy = timeCopy.replaceAll("AM", "");

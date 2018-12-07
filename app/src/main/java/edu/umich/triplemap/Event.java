@@ -95,12 +95,40 @@ public class Event {
      */
     public int[] getProcessedTime() {
         String timeCopy = startTime;
+        boolean am = false;
+        boolean pm = false;
+
+        if(timeCopy.contains("AM") || timeCopy.contains("am")) {
+            am = true;
+            timeCopy = timeCopy.replaceAll("AM", "");
+            timeCopy = timeCopy.replaceAll("am", "");
+        }
+
+        if(timeCopy.contains("PM") || timeCopy.contains("pm")) {
+            pm = true;
+            timeCopy = timeCopy.replaceAll("PM", "");
+            timeCopy = timeCopy.replaceAll("pm", "");
+        }
+
         String[] time = timeCopy.split(":");
         if(time.length == 2) {
-            return new int[] {Integer.valueOf(time[0]), Integer.valueOf(time[1])};
+            if(am) {
+                return new int[] {Integer.valueOf(time[0]), Integer.valueOf(time[1])};
+            } else if(pm) {
+                return new int[] {Integer.valueOf(time[0]) + 12, Integer.valueOf(time[1])};
+            } else {
+                return new int[] {Integer.valueOf(time[0]), Integer.valueOf(time[1])};
+            }
+
         } else {
             //Assume only hour specified
-            return new int[] {Integer.valueOf(time[0]), 0};
+            if(am) {
+                return new int[] {Integer.valueOf(time[0]), 0};
+            } else if(pm) {
+                return new int[] {Integer.valueOf(time[0]) + 12, 0};
+            } else {
+                return new int[] {Integer.valueOf(time[0]), 0};
+            }
         }
     }
 
